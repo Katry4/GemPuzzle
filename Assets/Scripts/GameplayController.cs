@@ -16,9 +16,10 @@ public class GameplayController : MonoBehaviour
 
 	public void StartGame()
 	{
+		Debug.Log("Pause Game");
 		Pause();
 		_board.Init();
-		_board.OnWin = () => { CompleteGame(true); };
+		_board.OnWin = () => { StartCoroutine(WinGame()); };
 		_currentGametype = GameManager.Instance.GetCurrentGameType();
 		if (_currentGametype == IDs.GameType.Steps)
 		{
@@ -31,6 +32,12 @@ public class GameplayController : MonoBehaviour
 			_maxGameplayTime = GameManager.Instance.GetMaxGameplayTimeInMins() * 60;
 		}
 		Unpause();
+	}
+
+	private IEnumerator WinGame()
+	{
+		yield return new WaitForSeconds(0.2f * Time.timeScale);
+		CompleteGame(true);
 	}
 
 	internal void Move(IntVector2 dir)
@@ -62,11 +69,13 @@ public class GameplayController : MonoBehaviour
 			}
 		}
 		UpdateHUD();
+
+		Debug.Log("Timescale"+Time.timeScale);
 	}
 
 	private void CompleteGame(bool result)
 	{
-		Pause();
+		_isGamePaused = true;
 		_gameplaySceneController.ShowCompleteGamePanel(result);
 	}
 
@@ -77,15 +86,14 @@ public class GameplayController : MonoBehaviour
 
 	internal void Pause()
 	{
+		Debug.Log("Pause");
 		_isGamePaused = true;
-		Time.timeScale = 0.001f;
 	}
 
 
 	internal void Unpause()
 	{
 		_isGamePaused = false;
-		Time.timeScale = 1;
 	}
 
 	private void UpdateHUD()
@@ -96,7 +104,7 @@ public class GameplayController : MonoBehaviour
 			float seconds = _maxGameplayTime - _gameplayTime;
 			int minutes = (int)seconds / 60;
 			seconds -= minutes * 60;
-			leftText = minutes + ":" + (int)seconds;
+			leftText = minutes + ":" + (int)seconds + " seconds";
 		}
 		else
 		{
