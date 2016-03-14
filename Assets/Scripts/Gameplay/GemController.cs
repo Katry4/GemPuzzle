@@ -14,11 +14,15 @@ public class GemController : MonoBehaviour
 	{
 		_number = index;
 		_text.text = _number.ToString();
+		_distance = distance;
 	}
 
 	internal void Move(IntVector2 direction)
 	{
+		//FIXME Because of the rotation of the board - left and right direction are swaped
+		Vector3 targetPos = new Vector3(transform.localPosition.x + direction.x * _distance, transform.localPosition.y, transform.localPosition.z - direction.y * _distance);
 
+		iTween.MoveTo(gameObject, iTween.Hash("position", targetPos, "islocal", true, "time", 0.2));
 	}
 
 	public int Number
