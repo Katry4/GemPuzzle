@@ -19,14 +19,14 @@ public class InputController : MonoBehaviour
 		var delta = pointerData.position - _beginDragPosition;
 		if (delta.magnitude < _defaultOffset) return;
 
-		Vector2 direction;
+		IntVector2 direction;
 		if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
 		{
-			direction = delta.x > 0 ? Vector2.right : Vector2.left;
+			direction = delta.x > 0 ? IntVector2.right : IntVector2.left;
 		}
 		else
 		{
-			direction = delta.y > 0 ? Vector2.up : Vector2.down;
+			direction = delta.y > 0 ? IntVector2.down : IntVector2.up;
 		}
 
 		GameManager.Instance.SetInputMove(direction);

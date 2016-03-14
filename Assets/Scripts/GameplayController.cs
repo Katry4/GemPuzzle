@@ -5,6 +5,7 @@ using System;
 public class GameplayController : MonoBehaviour {
 
 	[SerializeField] private bool _isGamePaused = false;
+	[SerializeField] private BoardController _board;
 	// Use this for initialization
 	void Start () {
 	
@@ -15,11 +16,11 @@ public class GameplayController : MonoBehaviour {
 	
 	}
 
-	internal void Move(Vector2 dir)
+	internal void Move(IntVector2 dir)
 	{
 		if (!IsPaused())
 		{
-			throw new NotImplementedException();
+			_board.TryMove(dir);
 		}
 	}
 

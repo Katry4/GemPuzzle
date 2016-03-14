@@ -9,9 +9,8 @@ public class GameManager : MonoBehaviour
 	[SerializeField] private IDs.GameType _gameType;
 	[SerializeField] private GameplayController gameController;
 
-	public void SetInputMove(Vector2 dir)
+	public void SetInputMove(IntVector2 dir)
 	{
-		Debug.Log("Input mvoe " + dir);
 		gameController.Move(dir);
 	}
 
