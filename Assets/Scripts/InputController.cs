@@ -1,15 +1,34 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
-public class InputController : MonoBehaviour {
+public class InputController : MonoBehaviour
+{
+	[SerializeField] private float _defaultOffset = 20;
 
-	// Use this for initialization
-	void Start () {
-	
+	private Vector2 _beginDragPosition;
+	public void BeginDrag(BaseEventData data)
+	{
+		PointerEventData pointerData = (PointerEventData)data;
+		_beginDragPosition = pointerData.position;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+	public void EndDrag(BaseEventData data)
+	{
+		PointerEventData pointerData = (PointerEventData)data;
+		var delta = pointerData.position - _beginDragPosition;
+		if (delta.magnitude < _defaultOffset) return;
+
+		Vector2 direction;
+		if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+		{
+			direction = delta.x > 0 ? Vector2.right : Vector2.left;
+		}
+		else
+		{
+			direction = delta.y > 0 ? Vector2.up : Vector2.down;
+		}
+
+		GameManager.Instance.SetInputMove(direction);
 	}
 }
