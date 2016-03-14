@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class GameplaySceneController : BasicSceneController
 {
+	[SerializeField] private GameplayController _gameplayController;
 	[SerializeField] private Text _leftText;
 
 	[SerializeField] private GameObject _pausePanel;
@@ -22,19 +23,25 @@ public class GameplaySceneController : BasicSceneController
 
 	private void PauseGame()
 	{
-		Time.timeScale = 0.0001f;
 		_pausePanel.SetActive(true);
-	}
+		_gameplayController.Pause();
+    }
 
 	private void UpauseGame()
 	{
-		Time.timeScale = 1;
 		_pausePanel.SetActive(false);
+		_gameplayController.Unpause();
+    }
+
+	public void ShowCompleteGamePanel(bool didWin) {
+		string mainText = didWin ? "You win" : "You lose";
+		_winMainText.text = mainText;
+		_winPanel.SetActive(true);
 	}
 
-	public void ShowWinPanel(bool didWin) {
-		string MainText = didWin ? "You win" : "You lose";
-		_winPanel.SetActive(true);
+	public void UpdateGameHUD(string text)
+	{
+		_leftText.text = text;
 	}
 
 	#region Buttons events

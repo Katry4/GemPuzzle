@@ -5,16 +5,23 @@ using System;
 public class BoardController : MonoBehaviour
 {
 
-	[SerializeField] private int _itemsInRow = 4;
-	[SerializeField] private float _gemsOffset = 1.15f;
-	[SerializeField] private GemController _gemPrefab;
+	[SerializeField]
+	private int _itemsInRow = 4;
+	[SerializeField]
+	private int _difficulty = 1;
+	[SerializeField]
+	private float _gemsOffset = 1.15f;
+
+	const float _moveAnimationTime = 0.1f;
+	[SerializeField]
+	private GemController _gemPrefab;
 
 	private GemController[,] _gems;
 	public IntVector2 _blankPos;
 
+	public Action OnWin;
 
-	// Use this for initialization
-	void Awake()
+	public void Init()
 	{
 		_gems = new GemController[_itemsInRow, _itemsInRow];
 
@@ -47,38 +54,76 @@ public class BoardController : MonoBehaviour
 				_gems[j, i] = gem;
 			}
 		}
+		Shuffle();
 
 		LogArray();
 	}
 
-	internal bool TryMove(IntVector2 dir)
+	private void Shuffle()
 	{
-		return TryToMove(dir);
-		//LogArray();
+		int tryes = 0;
+
+		while (tryes++ < _difficulty)
+		{
+			TryToMove(IntVector2.RandomDirection(), 0);
+		}
 	}
 
-	private bool TryToMove(IntVector2 direction)
+	internal bool TryMove(IntVector2 dir)
+	{
+		if (TryToMove(dir))
+		{
+			CheckForWin();
+			return true;
+		}
+		else return false;
+	}
+
+	private bool TryToMove(IntVector2 direction, float moveAnimationTime = _moveAnimationTime)
 	{
 		if (direction.x == -1 && _blankPos.x == _itemsInRow - 1 || //left border
 			direction.x == 1 && _blankPos.x == 0 || // right border
 			direction.y == -1 && _blankPos.y == _itemsInRow - 1 || //top border
 			direction.y == 1 && _blankPos.y == 0) // bottom border
 		{
+			IntVector2 targetPos = _blankPos - direction;
 			return false;
 		}
 		else
 		{
-
 			IntVector2 targetPos = _blankPos - direction;
 
 			var targetGem = _gems[targetPos.x, targetPos.y];
-			targetGem.Move(direction);
+			targetGem.MoveTo(direction, moveAnimationTime);
 
 			var blankGem = _gems[_blankPos.x, _blankPos.y];
 			_gems[targetPos.x, targetPos.y] = blankGem;
 			_gems[_blankPos.x, _blankPos.y] = targetGem;
 			_blankPos = targetPos;
 			return true;
+		}
+	}
+
+	private void CheckForWin()
+	{
+		if (_gems[_itemsInRow - 1, _itemsInRow - 1].IsEmpty())
+		{
+			int index = 1;
+			for (int i = 0; i < _itemsInRow; i++)
+			{
+				for (int j = 0; j < _itemsInRow; j++)
+				{
+					if (i == _itemsInRow - 1 && j == _itemsInRow - 1)
+					{
+						OnWin();
+					}
+					else if (index++ != _gems[j, i].Number)
+					{
+						return;
+					}
+				}
+			}
+
 		}
 	}
 
@@ -89,7 +134,7 @@ public class BoardController : MonoBehaviour
 		{
 			for (int j = 0; j < _itemsInRow; j++)
 			{
-				label += _gems[j, i].Number+"\t";
+				label += _gems[j, i].Number + "\t";
 			}
 			label += "\n";
 		}

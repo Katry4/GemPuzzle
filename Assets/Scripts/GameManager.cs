@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
 	public static GameManager Instance;
 
 	[SerializeField] private IDs.GameType _gameType;
+	[SerializeField] private int _maxAmountOfSteps = 20;
+	[SerializeField] private float _maxGameDurationInMins = 0.5f;
 	[SerializeField] private GameplayController gameController;
 
 	public void SetInputMove(IntVector2 dir)
@@ -24,27 +26,28 @@ public class GameManager : MonoBehaviour
 		_gameType = type;
 	}
 
-	public bool IsGamePaused()
+	public int GetMaxAmountOfSteps()
 	{
-		return gameController.IsPaused();
+		return _maxAmountOfSteps;
 	}
 
-	public void PauseGame()
+	public float GetMaxGameplayTimeInMins()
 	{
-		gameController.Pause();
+		return _maxGameDurationInMins;
 	}
 
-	public void UnpauseGame()
-	{
-		gameController.Unpause();
-	}
-	
 	void Awake()
 	{
 		if (Instance == null)
 		{
 			Instance = this;
 			gameObject.name = "GameManager";
+
+			if (SceneManager.GetActiveScene().name == IDs.Scenes.gameScene)
+			{
+				gameController = FindObjectOfType<GameplayController>();
+				gameController.StartGame();
+			}
 		}
 		else
 		{
@@ -55,9 +58,13 @@ public class GameManager : MonoBehaviour
 
 	public void OnLevelWasLoaded(int level)
 	{
-		if (SceneManager.GetActiveScene().name == IDs.Scenes.gameScene)
+		if (this == Instance)
 		{
-			gameController = FindObjectOfType<GameplayController>();
+			if (SceneManager.GetActiveScene().name == IDs.Scenes.gameScene)
+			{
+				gameController = FindObjectOfType<GameplayController>();
+				gameController.StartGame();
+			}
 		}
 	}
 }

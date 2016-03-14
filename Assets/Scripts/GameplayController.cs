@@ -4,21 +4,33 @@ using System;
 
 public class GameplayController : MonoBehaviour
 {
-
+	[SerializeField] private GameplaySceneController _gameplaySceneController;
 	[SerializeField] private bool _isGamePaused = false;
 	[SerializeField] private BoardController _board;
 
-	Action OnMoveComplited;
-	// Use this for initialization
-	void Start()
+	private IDs.GameType _currentGametype;
+	private int _completedSteps = 0;
+	private int _maxAmountOfSteps;
+	private float _gameplayTime = 0;
+	private float _maxGameplayTime;
+
+	public void StartGame()
 	{
-
-	}
-
-	// Update is called once per frame
-	void Update()
-	{
-
+		Pause();
+		_board.Init();
+		_board.OnWin = () => { CompleteGame(true); };
+		_currentGametype = GameManager.Instance.GetCurrentGameType();
+		if (_currentGametype == IDs.GameType.Steps)
+		{
+			_maxAmountOfSteps = GameManager.Instance.GetMaxAmountOfSteps();
+			_completedSteps = 0;
+		}
+		else
+		{
+			_gameplayTime = 0;
+			_maxGameplayTime = GameManager.Instance.GetMaxGameplayTimeInMins() * 60;
+		}
+		Unpause();
 	}
 
 	internal void Move(IntVector2 dir)
@@ -31,11 +43,32 @@ public class GameplayController : MonoBehaviour
 			}
 			else
 			{
-				OnMoveComplited();
+				if (_currentGametype == IDs.GameType.Steps && ++_completedSteps >= _maxAmountOfSteps)
+				{
+					CompleteGame(false);
+				}
 			}
 		}
 	}
 
+	void Update()
+	{
+		if (_currentGametype == IDs.GameType.Time && !IsPaused())
+		{
+			_gameplayTime += Time.deltaTime;
+			if (_gameplayTime > _maxGameplayTime)
+			{
+				CompleteGame(false);
+			}
+		}
+		UpdateHUD();
+	}
+
+	private void CompleteGame(bool result)
+	{
+		Pause();
+		_gameplaySceneController.ShowCompleteGamePanel(result);
+	}
 
 	internal bool IsPaused()
 	{
@@ -45,11 +78,31 @@ public class GameplayController : MonoBehaviour
 	internal void Pause()
 	{
 		_isGamePaused = true;
+		Time.timeScale = 0.001f;
 	}
 
 
 	internal void Unpause()
 	{
 		_isGamePaused = false;
+		Time.timeScale = 1;
+	}
+
+	private void UpdateHUD()
+	{
+		string leftText;
+		if (_currentGametype == IDs.GameType.Time)
+		{
+			float seconds = _maxGameplayTime - _gameplayTime;
+			int minutes = (int)seconds / 60;
+			seconds -= minutes * 60;
+			leftText = minutes + ":" + (int)seconds;
+		}
+		else
+		{
+			int leftSteps = _maxAmountOfSteps - _completedSteps;
+			leftText = leftSteps + (leftSteps == 1 ? " move" : " moves");
+		}
+		_gameplaySceneController.UpdateGameHUD("Left: " + leftText);
 	}
 }

@@ -34,4 +34,21 @@ public class IntVector2
 		return new IntVector2(v1.x - v2.x, v1.y - v2.y);
 	}
 
+	public static IntVector2 RandomDirection()
+	{
+		if (Random.value < 0.25f)
+		{
+			return up;
+		}
+		else if (Random.value < 0.5f)
+		{
+			return right;
+		}
+		else if (Random.value < 0.75f)
+		{
+			return down;
+		}
+		else return left;
+	}
+
 }
