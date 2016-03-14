@@ -16,7 +16,6 @@ public class GameplayController : MonoBehaviour
 
 	public void StartGame()
 	{
-		Debug.Log("Pause Game");
 		Pause();
 		_board.Init();
 		_board.OnWin = () => { StartCoroutine(WinGame()); };
@@ -69,8 +68,6 @@ public class GameplayController : MonoBehaviour
 			}
 		}
 		UpdateHUD();
-
-		Debug.Log("Timescale"+Time.timeScale);
 	}
 
 	private void CompleteGame(bool result)
@@ -86,7 +83,6 @@ public class GameplayController : MonoBehaviour
 
 	internal void Pause()
 	{
-		Debug.Log("Pause");
 		_isGamePaused = true;
 	}
 

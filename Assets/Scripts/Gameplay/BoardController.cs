@@ -5,16 +5,11 @@ using System;
 public class BoardController : MonoBehaviour
 {
 
-	[SerializeField]
-	private int _itemsInRow = 4;
-	[SerializeField]
-	private int _difficulty = 1;
-	[SerializeField]
-	private float _gemsOffset = 1.15f;
+	[SerializeField] private int _itemsInRow = 4;
+	[SerializeField] private float _gemsOffset = 1.15f;
 
-	const float _moveAnimationTime = 0.1f;
-	[SerializeField]
-	private GemController _gemPrefab;
+	const float _moveAnimationTime = 0.2f;
+	[SerializeField] private GemController _gemPrefab;
 
 	private GemController[,] _gems;
 	public IntVector2 _blankPos;
@@ -56,16 +51,29 @@ public class BoardController : MonoBehaviour
 		}
 		Shuffle();
 
-		LogArray();
+		//LogArray();
 	}
 
 	private void Shuffle()
 	{
-		int tryes = 0;
-
-		while (tryes++ < _difficulty)
+		int moves = 0;
+		int difficulty;
+		if (GameManager.Instance.GetCurrentGameType() == IDs.GameType.Time)
 		{
-			TryToMove(IntVector2.RandomDirection(), 0);
+			int sec = (int)Math.Round(GameManager.Instance.GetMaxGameplayTimeInMins() * 60);
+            difficulty =  sec / 3;
+		}
+		else
+		{
+			difficulty = (int)Mathf.Round(GameManager.Instance.GetMaxAmountOfSteps() *0.75f);
+		}
+		
+		while (moves <= difficulty)// || moves++ < difficulty)
+		{
+			if (TryToMove(IntVector2.RandomDirection(), 0))
+			{
+				moves++;
+			}
 		}
 	}
 
