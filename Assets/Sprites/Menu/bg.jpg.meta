@@ -1,14 +1,13 @@
 fileFormatVersion: 2
-guid: 5e3139976bec25144a1bf6855a46c9c1
-timeCreated: 1457898688
+guid: 6adaed4c8b3327840a935151ad039a3a
+timeCreated: 1458151603
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName:
-    21300000: IMG_0667_0
+  fileIDToRecycleName: {}
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 1
+    enableMipMap: 0
     linearTexture: 0
     correctGamma: 0
     fadeOut: 0
@@ -39,35 +38,20 @@ TextureImporter:
   rGBM: 0
   compressionQuality: 50
   allowsAlphaSplitting: 0
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spriteBorder: {x: 0, y: 702, z: 0, w: 392}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
   alphaIsTransparency: 1
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
-    sprites:
-    - name: IMG_0667_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 629
-        width: 1899
-        height: 1834
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline:
-      - - {x: -683, y: 660.3146}
-        - {x: -683, y: -659.6854}
-        - {x: 683, y: -659.6854}
-        - {x: 683, y: 660.3146}
+    sprites: []
     outline: []
-  spritePackingTag: 
+  spritePackingTag: ui
   userData: 
   assetBundleName: 
   assetBundleVariant: 
