@@ -4,14 +4,17 @@ using System;
 
 public class GameplayController : MonoBehaviour
 {
-	[SerializeField] private GameplaySceneController _gameplaySceneController;
+	[SerializeField] private UIGameplaySceneController _gameplaySceneController;
 	[SerializeField] private bool _isGamePaused = false;
 	[SerializeField] private BoardController _board;
+
+	public Action<IDs.GameType, int> UpdateHUD;
 
 	private IDs.GameType _currentGametype;
 	private int _completedSteps = 0;
 	private int _maxAmountOfSteps;
 	private float _gameplayTime = 0;
+	private int _gameplayTimeInSec = 0;
 	private float _maxGameplayTime;
 
 	public void StartGame()
@@ -28,8 +31,11 @@ public class GameplayController : MonoBehaviour
 		else
 		{
 			_gameplayTime = 0;
+			_gameplayTimeInSec = 0;
 			_maxGameplayTime = GameManager.Instance.GetMaxGameplayTimeInMins() * 60;
 		}
+
+		UpdateGameplayHUD();
 		Unpause();
 	}
 
@@ -53,6 +59,7 @@ public class GameplayController : MonoBehaviour
 				{
 					CompleteGame(false);
 				}
+				UpdateGameplayHUD();
 			}
 		}
 	}
@@ -62,12 +69,24 @@ public class GameplayController : MonoBehaviour
 		if (_currentGametype == IDs.GameType.Time && !IsPaused())
 		{
 			_gameplayTime += Time.deltaTime;
-			if (_gameplayTime > _maxGameplayTime)
+			if (_gameplayTime > _gameplayTimeInSec)
 			{
-				CompleteGame(false);
+				OnTimeChanged();
 			}
 		}
-		UpdateHUD();
+	}
+
+	private void OnTimeChanged()
+	{
+		_gameplayTimeInSec = (int)Math.Ceiling(_gameplayTime) - 1;
+		float spentTime = (int)(_maxGameplayTime - _gameplayTime);
+
+		UpdateGameplayHUD();
+
+		if (spentTime > _maxGameplayTime)
+		{
+			CompleteGame(false);
+		}
 	}
 
 	private void CompleteGame(bool result)
@@ -92,21 +111,33 @@ public class GameplayController : MonoBehaviour
 		_isGamePaused = false;
 	}
 
-	private void UpdateHUD()
+	private void UpdateGameplayHUD()
 	{
-		string leftText;
+		if (UpdateHUD != null)
+		{
+			UpdateHUD(_currentGametype, GetCurrentLeftAmount());
+		}
+	}
+
+	private int GetCurrentLeftAmount()
+	{
 		if (_currentGametype == IDs.GameType.Time)
 		{
-			float seconds = _maxGameplayTime - _gameplayTime;
-			int minutes = (int)seconds / 60;
-			seconds -= minutes * 60;
-			leftText = minutes + ":" + (int)seconds + " seconds";
+			return GetSecondsLeft();
 		}
 		else
 		{
-			int leftSteps = _maxAmountOfSteps - _completedSteps;
-			leftText = leftSteps + (leftSteps == 1 ? " move" : " moves");
+			return GetMovesLeft();
 		}
-		_gameplaySceneController.UpdateGameHUD("Left: " + leftText);
+	}
+
+	private int GetSecondsLeft()
+	{
+		return (int)_maxGameplayTime - _gameplayTimeInSec;
+	}
+
+	private int GetMovesLeft()
+	{
+		return _maxAmountOfSteps - _completedSteps;
 	}
 }

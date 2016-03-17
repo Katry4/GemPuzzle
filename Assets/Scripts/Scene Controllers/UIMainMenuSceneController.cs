@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using System;
 
-public class MainMenuSceneController : BasicSceneController
+public class UIMainMenuSceneController : UIBasicSceneController
 {
 	[SerializeField] private GameObject _credentialPanel;
 

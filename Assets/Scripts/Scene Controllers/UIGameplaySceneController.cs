@@ -4,7 +4,7 @@ using System;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GameplaySceneController : BasicSceneController
+public class UIGameplaySceneController : UIBasicSceneController
 {
 	[SerializeField] private GameplayController _gameplayController;
 	[SerializeField] private Text _leftText;
@@ -17,6 +17,7 @@ public class GameplaySceneController : BasicSceneController
 
 	void Start()
 	{
+		_gameplayController.UpdateHUD = UpdateHUD;
 		_pausePanel.SetActive(false);
 		_winPanel.SetActive(false);
 	}
@@ -39,9 +40,22 @@ public class GameplaySceneController : BasicSceneController
 		_winPanel.SetActive(true);
 	}
 
-	public void UpdateGameHUD(string text)
+	private void UpdateHUD(IDs.GameType gameType, int left)
 	{
-		_leftText.text = text;
+		string leftText;
+		if (gameType == IDs.GameType.Time)
+		{
+			int seconds = left;
+			int minutes = seconds / 60;
+			seconds -= minutes * 60;
+			leftText = minutes + ":" + seconds + " seconds";
+		}
+		else
+		{
+			leftText = left + (left == 1 ? " move" : " moves");
+		}
+
+		_leftText.text = leftText;
 	}
 
 	#region Buttons events
@@ -57,6 +71,7 @@ public class GameplaySceneController : BasicSceneController
 
 	public void OnExitButtonPressed()
 	{
+		_gameplayController.UpdateHUD -= UpdateHUD;
 		SceneManager.LoadScene(IDs.Scenes.mainMenuScene);
 	}
 	#endregion
