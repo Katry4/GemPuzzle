@@ -5,7 +5,7 @@ using System;
 public class GameplayController : MonoBehaviour
 {
 	[SerializeField] private UIGameplaySceneController _gameplaySceneController;
-	[SerializeField] private bool _isGamePaused = false;
+	private bool _isGamePaused = false;
 	[SerializeField] private BoardController _board;
 
 	public Action<IDs.GameType, int> UpdateHUD;
