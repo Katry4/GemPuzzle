@@ -21,7 +21,11 @@ public class GameplayController : MonoBehaviour
 	{
 		Pause();
 		_board.Init();
-		_board.OnWin = () => { StartCoroutine(WinGame()); };
+		_board.OnWin = () =>
+		{
+			GameManager.Instance.OnLevelCompleted();
+			StartCoroutine(WinGame());
+		};
 		_currentGametype = GameManager.Instance.GetCurrentGameType();
 		if (_currentGametype == IDs.GameType.Steps)
 		{
@@ -45,7 +49,7 @@ public class GameplayController : MonoBehaviour
 		CompleteGame(true);
 	}
 
-	internal void Move(IntVector2 dir)
+	public void Move(IntVector2 dir)
 	{
 		if (!IsPaused())
 		{

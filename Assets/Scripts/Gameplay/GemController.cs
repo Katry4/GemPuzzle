@@ -6,21 +6,25 @@ public class GemController : MonoBehaviour
 {
 	[SerializeField] private TextMesh _text;
 	private int _number;
-	private float _distance;
 
 	const int EmptyNumber = -33;
 
-	public void Init(int index, float distance)
+	public void Init(int index, Vector3 newPos)
 	{
 		_number = index;
 		_text.text = _number.ToString();
-		_distance = distance;
+
+		transform.localPosition = newPos;
 	}
 
-	internal void MoveTo(IntVector2 direction, float animationTime)
+	public void InitAsBlank()
 	{
-		//FIXME Because of the rotation of the board - left and right direction are swaped
-		Vector3 targetPos = new Vector3(transform.localPosition.x + direction.x * _distance, transform.localPosition.y, transform.localPosition.z - direction.y * _distance);
+		_number = EmptyNumber;
+	}
+
+	internal void MoveTo(Vector3 targetPos, float animationTime)
+	{
+		StopAllCoroutines();
 		if (animationTime == 0)
 		{
 			transform.localPosition = targetPos;
@@ -34,13 +38,6 @@ public class GemController : MonoBehaviour
 	public int Number
 	{
 		get { return _number; }
-	}
-
-	public static GemController BlankGem()
-	{
-		var gem = new GemController();
-		gem._number = EmptyNumber;
-		return gem;
 	}
 
 	public bool IsEmpty()

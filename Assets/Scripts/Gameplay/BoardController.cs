@@ -11,8 +11,10 @@ public class BoardController : MonoBehaviour
 	const float _moveAnimationTime = 0.2f;
 	[SerializeField] private GemController _gemPrefab;
 
+	private float _distanceBetweenGems;
 	private GemController[,] _gems;
-	public IntVector2 _blankPos;
+	private IntVector2 _blankPos;
+
 
 	public Action OnWin;
 
@@ -21,6 +23,7 @@ public class BoardController : MonoBehaviour
 		_gems = new GemController[_itemsInRow, _itemsInRow];
 
 		float prefabSize = _gemPrefab.GetComponent<Renderer>().bounds.size.x;
+		_distanceBetweenGems = prefabSize * _gemsOffset;
 		for (int i = 0; i < _itemsInRow; i++)
 		{
 			for (int j = 0; j < _itemsInRow; j++)
@@ -28,7 +31,7 @@ public class BoardController : MonoBehaviour
 				if (i == _itemsInRow - 1 && j == _itemsInRow - 1)
 				{
 					_blankPos = new IntVector2(i, j);
-					_gems[i, j] = GemController.BlankGem();
+					_gems[i, j] = GetBlankGem();
 					continue;
 				}
 				GemController gem = Instantiate(_gemPrefab);
@@ -38,20 +41,21 @@ public class BoardController : MonoBehaviour
 
 
 				float x = (j - _itemsInRow * 0.5f + 0.5f) * prefabSize;
-				//FIXME not elegant, but works as aspected. God forgive me
-				Vector3 newPos = new Vector3(
-					(j - _itemsInRow * 0.5f + 0.5f) * prefabSize * _gemsOffset,
-					_gemPrefab.transform.localPosition.y,
-					((_itemsInRow - i - 1) - _itemsInRow * 0.5f + 0.5f) * prefabSize * _gemsOffset);
 
-				gem.transform.localPosition = newPos;
-				gem.Init(i * _itemsInRow + (j) + 1, prefabSize * _gemsOffset);
+				gem.Init(i * _itemsInRow + (j) + 1, GetItemPos(i, j));
 				_gems[j, i] = gem;
 			}
 		}
 		Shuffle();
+	}
 
-		//LogArray();
+	private Vector3 GetItemPos(int i, int j)
+	{
+		//FIXME not elegant, but works as aspected. God forgive me
+		return new Vector3(
+					(j - _itemsInRow * 0.5f + 0.5f) * _distanceBetweenGems,
+					_gemPrefab.transform.localPosition.y,
+					((_itemsInRow - i - 1) - _itemsInRow * 0.5f + 0.5f) * _distanceBetweenGems);
 	}
 
 	private void Shuffle()
@@ -61,14 +65,14 @@ public class BoardController : MonoBehaviour
 		if (GameManager.Instance.GetCurrentGameType() == IDs.GameType.Time)
 		{
 			int sec = (int)Math.Round(GameManager.Instance.GetMaxGameplayTimeInMins() * 60);
-            difficulty =  sec / 3;
+            difficulty =  sec / GameManager.Instance.GetTimeDifficultyKoef();
 		}
 		else
 		{
-			difficulty = (int)Mathf.Round(GameManager.Instance.GetMaxAmountOfSteps() *0.75f);
+			difficulty = (int)Mathf.Round(GameManager.Instance.GetMaxAmountOfSteps() / GameManager.Instance.GetStepsDifficultyKoef());
 		}
 		
-		while (moves <= difficulty)// || moves++ < difficulty)
+		while (moves <= difficulty)
 		{
 			if (TryToMove(IntVector2.RandomDirection(), 0))
 			{
@@ -81,6 +85,7 @@ public class BoardController : MonoBehaviour
 	{
 		if (TryToMove(dir))
 		{
+			LogArray();
 			CheckForWin();
 			return true;
 		}
@@ -99,15 +104,17 @@ public class BoardController : MonoBehaviour
 		}
 		else
 		{
-			IntVector2 targetPos = _blankPos - direction;
+			IntVector2 targetIndex = _blankPos - direction;
 
-			var targetGem = _gems[targetPos.x, targetPos.y];
-			targetGem.MoveTo(direction, moveAnimationTime);
+			var targetGem = _gems[targetIndex.x, targetIndex.y];
+
+			//FIXME Because of the rotation of the board - x and y direction are swaped
+			targetGem.MoveTo(GetItemPos(_blankPos.y, _blankPos.x), moveAnimationTime);
 
 			var blankGem = _gems[_blankPos.x, _blankPos.y];
-			_gems[targetPos.x, targetPos.y] = blankGem;
+			_gems[targetIndex.x, targetIndex.y] = blankGem;
 			_gems[_blankPos.x, _blankPos.y] = targetGem;
-			_blankPos = targetPos;
+			_blankPos = targetIndex;
 			return true;
 		}
 	}
@@ -124,6 +131,7 @@ public class BoardController : MonoBehaviour
 					if (i == _itemsInRow - 1 && j == _itemsInRow - 1)
 					{
 						OnWin();
+						return;
 					}
 					else if (index++ != _gems[j, i].Number)
 					{
@@ -133,6 +141,13 @@ public class BoardController : MonoBehaviour
 			}
 
 		}
+	}
+
+	private GemController GetBlankGem()
+	{
+		GemController gem = new GemController();
+		gem.InitAsBlank();
+		return gem;
 	}
 
 	private void LogArray()

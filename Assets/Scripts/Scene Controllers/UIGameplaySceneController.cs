@@ -15,7 +15,7 @@ public class UIGameplaySceneController : UIBasicSceneController
 	[SerializeField] private Text _winMainText;
 
 
-	void Start()
+	void Awake()
 	{
 		_gameplayController.UpdateHUD = UpdateHUD;
 		_pausePanel.SetActive(false);
@@ -55,7 +55,7 @@ public class UIGameplaySceneController : UIBasicSceneController
 			leftText = left + (left == 1 ? " move" : " moves");
 		}
 
-		_leftText.text = leftText;
+		_leftText.text = "Left : "+leftText;
 	}
 
 	#region Buttons events

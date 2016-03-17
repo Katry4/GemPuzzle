@@ -4,7 +4,9 @@ using UnityEngine.EventSystems;
 
 public class InputController : MonoBehaviour
 {
+	[SerializeField] private GameplayController _gameplayController;
 	[SerializeField] private float _defaultOffset = 20;
+	
 
 	private Vector2 _beginDragPosition;
 	public void BeginDrag(BaseEventData data)
@@ -29,6 +31,6 @@ public class InputController : MonoBehaviour
 			direction = delta.y > 0 ? IntVector2.down : IntVector2.up;
 		}
 
-		GameManager.Instance.SetInputMove(direction);
+		_gameplayController.Move(direction);
 	}
 }
